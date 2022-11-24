@@ -2,7 +2,7 @@ package conf
 
 import (
 	"fmt"
-	"gin-blog/dao"
+	"gin-blog/model"
 	"gopkg.in/ini.v1"
 	"strings"
 )
@@ -34,7 +34,7 @@ func Init() {
 	LoadQiniu(file)
 	path := strings.Join([]string{DbUser, ":", DbPassWord, "@tcp(", DbHost, ":", DbPort, ")/", DbName, "?charset=utf8&parseTime=true"}, "")
 	// 连接数据库
-	dao.Database(path)
+	model.Database(path)
 }
 
 func LoadServer(file *ini.File) {
