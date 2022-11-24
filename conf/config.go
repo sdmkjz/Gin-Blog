@@ -2,7 +2,9 @@ package conf
 
 import (
 	"fmt"
+	"gin-blog/dao"
 	"gopkg.in/ini.v1"
+	"strings"
 )
 
 var (
@@ -30,6 +32,9 @@ func Init() {
 	LoadServer(file)
 	LoadMysql(file)
 	LoadQiniu(file)
+	path := strings.Join([]string{DbUser, ":", DbPassWord, "@tcp(", DbHost, ":", DbPort, ")/", DbName, "?charset=utf8&parseTime=true"}, "")
+	// 连接数据库
+	dao.Database(path)
 }
 
 func LoadServer(file *ini.File) {
