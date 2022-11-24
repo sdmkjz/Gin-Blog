@@ -7,6 +7,7 @@ import (
 	"gin-blog/serializer"
 	"gin-blog/service"
 	"github.com/gin-gonic/gin"
+	"strconv"
 )
 
 // 用户注册
@@ -39,4 +40,28 @@ func UserLogin(c *gin.Context) {
 			Msg:    msg,
 		})
 	}
+}
+
+// 查询单个用户
+func UserInfo(c *gin.Context) {
+	var userinfo service.UserService
+	id, _ := strconv.Atoi(c.Param("id"))
+	data := userinfo.Info(id)
+	c.JSON(e.SUCCSE, data)
+}
+
+// 查询用户列表
+func UsersInfo(c *gin.Context) {
+	var usersinfo service.UserService
+	pageSize, _ := strconv.Atoi(c.Query("pagesize"))
+	pageNum, _ := strconv.Atoi(c.Query("pagenum"))
+	username := c.Query("username")
+	if pageSize == 0 {
+		pageSize = -1
+	}
+	if pageNum == 0 {
+		pageNum = -1
+	}
+	data := usersinfo.InfoList(username, pageSize, pageNum)
+	c.JSON(e.SUCCSE, data)
 }

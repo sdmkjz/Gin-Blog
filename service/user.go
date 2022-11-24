@@ -84,3 +84,50 @@ func (service *UserService) Login() serializer.Response {
 		},
 	}
 }
+
+func (service *UserService) Info(id int) serializer.Response {
+	var user model.User
+	if err := model.Db.Where("id=?", id).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return serializer.Response{
+				Status: e.ERROR,
+				Msg:    e.GetErrMsg(e.ERROR_USER_NOT_EXIST),
+			}
+		}
+		return serializer.Response{
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR),
+		}
+	}
+	return serializer.Response{
+		Status: e.SUCCSE,
+		Data:   user,
+		Msg:    "ok",
+	}
+}
+
+func (service *UserService) InfoList(username string, pageSize int, pageNum int) serializer.ListResponse {
+	var user []model.User
+	var total int64
+	if username == "" {
+		model.Db.Limit(pageSize).Offset((pageNum - 1) * pageSize).Find(&user).Count(&total)
+		//model.Db.Model(&user).Count(&total)
+		return serializer.ListResponse{
+			Status: e.SUCCSE,
+			Data:   user,
+			Total:  total,
+			Msg:    "ok",
+		}
+	}
+	err := model.Db.Where("username LIKE ?", username+"%").Find(&user).Count(&total).Limit(pageSize).Offset((pageNum - 1) * pageSize).Error
+	if err != nil {
+		return serializer.ListResponse{Status: e.ERROR, Error: e.GetErrMsg(e.ERROR)}
+	}
+	return serializer.ListResponse{
+		Status: e.SUCCSE,
+		Data:   user,
+		Total:  total,
+		Msg:    "ok",
+	}
+
+}
