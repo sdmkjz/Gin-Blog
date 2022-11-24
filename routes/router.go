@@ -10,6 +10,7 @@ func NewRouter() *gin.Engine {
 	apiv1 := r.Group("api/v1")
 	{
 		apiv1.POST("user/register", v1.UserRegister)
+		apiv1.POST("user/login", v1.UserLogin)
 	}
 	return r
 }

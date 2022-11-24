@@ -3,7 +3,10 @@ package service
 import (
 	"fmt"
 	"gin-blog/model"
+	"gin-blog/pkg/e"
+	"gin-blog/pkg/utils"
 	"gin-blog/serializer"
+	"gorm.io/gorm"
 )
 
 type UserService struct {
@@ -41,5 +44,43 @@ func (service *UserService) Register() serializer.Response {
 	return serializer.Response{
 		Status: 200,
 		Msg:    "注册成功",
+	}
+}
+
+func (service *UserService) Login() serializer.Response {
+	var user model.User
+	if err := model.Db.Where("username=?", service.Username).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return serializer.Response{
+				Status: e.ERROR,
+				Msg:    e.GetErrMsg(e.ERROR_USER_NOT_EXIST),
+			}
+		}
+		return serializer.Response{
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR),
+		}
+	}
+	// 验证密码
+	if user.CheckPassword(service.Password) == false {
+		return serializer.Response{
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR_PASSWORD_WRONG),
+		}
+	}
+	// token返回
+	token, err := utils.GenerateToken(user.ID, service.Username)
+	if err != nil {
+		return serializer.Response{
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR_TOKEN_WRONG),
+		}
+	}
+	return serializer.Response{
+		Status: e.SUCCSE,
+		Data: serializer.TokenData{
+			User:  user.Username,
+			Token: token,
+		},
 	}
 }

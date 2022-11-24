@@ -24,3 +24,19 @@ func UserRegister(c *gin.Context) {
 		})
 	}
 }
+
+// 用户登录
+func UserLogin(c *gin.Context) {
+	var userLogin service.UserService
+	_ = c.ShouldBindJSON(&userLogin)
+	if msg, code := utils.Validate(&userLogin); code == e.SUCCSE {
+		res := userLogin.Login()
+		c.JSON(e.SUCCSE, res)
+	} else {
+		fmt.Println(code)
+		c.JSON(e.ERROR, serializer.Response{
+			Status: code,
+			Msg:    msg,
+		})
+	}
+}
