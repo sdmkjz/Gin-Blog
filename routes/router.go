@@ -25,6 +25,10 @@ func NewRouter() *gin.Engine {
 			authed.GET("category/:id", v1.CateInfo)
 			authed.GET("categorys", v1.CateList)
 			authed.DELETE("category/:id", v1.DelCate)
+			// 文章操作
+			authed.POST("article/add", v1.AddArticle)
+			authed.GET("article/:id", v1.ArticleInfo)
+			authed.PUT("article/:id", v1.ArticleEdit)
 		}
 	}
 	return r
