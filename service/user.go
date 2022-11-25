@@ -12,7 +12,7 @@ import (
 type UserService struct {
 	Username string `form:"username" json:"username" validate:"required,min=4,max=12" label:"用户名""`
 	Password string `form:"password" json:"password" validate:"required,min=6,max=20" label:"密码"`
-	Role     int    `gorm:"type:int" json:"role" validate:"required,gte=2" label:"角色"`
+	Role     int    `gorm:"type:int" json:"role" label:"角色"` // 1 管理员 2 普通用户
 }
 
 func (service *UserService) Register() serializer.Response {
@@ -60,6 +60,13 @@ func (service *UserService) Login() serializer.Response {
 		return serializer.Response{
 			Status: e.ERROR,
 			Msg:    e.GetErrMsg(e.ERROR),
+		}
+	}
+	// 权限验证
+	if user.Role != 1 {
+		return serializer.Response{
+			Status: e.ERROR_USER_NO_RIGHT,
+			Msg:    e.GetErrMsg(e.ERROR_USER_NO_RIGHT),
 		}
 	}
 	// 验证密码
