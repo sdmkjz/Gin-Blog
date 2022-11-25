@@ -65,3 +65,28 @@ func UsersInfo(c *gin.Context) {
 	data := usersinfo.InfoList(username, pageSize, pageNum)
 	c.JSON(e.SUCCSE, data)
 }
+
+// 编辑用户
+func UserEdit(c *gin.Context) {
+	var user service.UserService
+	id, _ := strconv.Atoi(c.Param("id"))
+	_ = c.ShouldBindJSON(&user)
+	if msg, code := utils.Validate(user); code == e.SUCCSE {
+		res := user.Edit(id)
+		c.JSON(e.SUCCSE, res)
+	} else {
+		c.JSON(e.ERROR, serializer.Response{
+			Status: e.ERROR,
+			Msg:    msg,
+		})
+	}
+}
+
+// 删除用户
+func UserDelete(c *gin.Context) {
+	var user service.UserService
+	id, _ := strconv.Atoi(c.Param("id"))
+	_ = c.ShouldBindJSON(&user)
+	res := user.Delete(id)
+	c.JSON(e.SUCCSE, res)
+}

@@ -2,6 +2,7 @@ package e
 
 var codeMsg = map[int]string{
 	SUCCSE:                 "OK",
+	REGISTER_SUCCSE:        "注册成功！",
 	ERROR:                  "FAIL",
 	ERROR_USERNAME_USED:    "用户名已存在！",
 	ERROR_PASSWORD_WRONG:   "密码错误",

@@ -12,6 +12,7 @@ import (
 type UserService struct {
 	Username string `form:"username" json:"username" validate:"required,min=4,max=12" label:"用户名""`
 	Password string `form:"password" json:"password" validate:"required,min=6,max=20" label:"密码"`
+	Role     int    `gorm:"type:int" json:"role" validate:"required,gte=2" label:"角色"`
 }
 
 func (service *UserService) Register() serializer.Response {
@@ -21,29 +22,29 @@ func (service *UserService) Register() serializer.Response {
 		First(&user).Count(&count)
 	if count == 1 {
 		return serializer.Response{
-			Status: 400,
-			Msg:    "用户名已存在",
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR_USERNAME_USED),
 		}
 	}
 	user.Username = service.Username
 	// 密码加密
 	if err := user.SetPassword(service.Password); err != nil {
 		return serializer.Response{
-			Status: 400,
-			Msg:    err.Error(),
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR),
 		}
 	}
 	// 创建用户
 	if err := model.Db.Create(&user).Error; err != nil {
 		fmt.Println(err)
 		return serializer.Response{
-			Status: 400,
-			Msg:    "数据库操作错误",
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR),
 		}
 	}
 	return serializer.Response{
-		Status: 200,
-		Msg:    "注册成功",
+		Status: e.SUCCSE,
+		Msg:    e.GetErrMsg(e.REGISTER_SUCCSE),
 	}
 }
 
@@ -130,4 +131,54 @@ func (service *UserService) InfoList(username string, pageSize int, pageNum int)
 		Msg:    "ok",
 	}
 
+}
+
+func (service *UserService) Edit(id int) serializer.Response {
+	var user model.User
+	var maps = make(map[string]interface{})
+	if err := model.Db.Where("id=?", id).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return serializer.Response{
+				Status: e.ERROR,
+				Msg:    e.GetErrMsg(e.ERROR_USER_NOT_EXIST),
+			}
+		}
+	}
+	if err := user.SetPassword(service.Password); err != nil {
+		return serializer.Response{
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR),
+		}
+	}
+	maps["username"] = service.Username
+	maps["password"] = user.Password
+	maps["role"] = service.Role
+	if err := model.Db.Model(&user).Where("id = ?", id).Updates(maps).Error; err != nil {
+		return serializer.Response{
+			Status: e.ERROR,
+			Msg:    e.GetErrMsg(e.ERROR),
+		}
+	}
+	return serializer.Response{
+		Status: e.SUCCSE,
+		Data:   user,
+		Msg:    "ok",
+	}
+}
+
+func (service *UserService) Delete(id int) serializer.Response {
+	var user model.User
+	if err := model.Db.Where("id = ?", id).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return serializer.Response{
+				Status: e.ERROR_USER_NOT_EXIST,
+				Msg:    e.GetErrMsg(e.ERROR_USER_NOT_EXIST),
+			}
+		}
+	}
+	model.Db.Where("id = ?", id).Delete(&user)
+	return serializer.Response{
+		Status: e.SUCCSE,
+		Msg:    e.GetErrMsg(e.SUCCSE),
+	}
 }

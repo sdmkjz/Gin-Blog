@@ -17,6 +17,8 @@ func NewRouter() *gin.Engine {
 		{
 			authed.GET("user/info/:id", v1.UserInfo)
 			authed.GET("users", v1.UsersInfo)
+			authed.PUT("user/:id", v1.UserEdit)
+			authed.DELETE("user/:id", v1.UserDelete)
 		}
 	}
 	return r

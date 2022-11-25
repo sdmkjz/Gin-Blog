@@ -1,8 +1,9 @@
 package e
 
 const (
-	SUCCSE = 200
-	ERROR  = 500
+	SUCCSE          = 200
+	REGISTER_SUCCSE = 201
+	ERROR           = 500
 
 	// code= 1000... 用户模块的错误
 	ERROR_USERNAME_USED    = 1001
