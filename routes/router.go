@@ -12,6 +12,11 @@ func NewRouter() *gin.Engine {
 	{
 		apiv1.POST("user/register", v1.UserRegister)
 		apiv1.POST("user/login", v1.UserLogin)
+		apiv1.GET("article/:id", v1.ArticleInfo)
+		apiv1.GET("articles/:id", v1.CateArticle)
+		apiv1.GET("category/:id", v1.CateInfo)
+		apiv1.GET("categorys", v1.CateList)
+		apiv1.GET("profile/:id", v1.ProfileInfo)
 		authed := apiv1.Group("/")
 		authed.Use(middleware.JWT())
 		{
@@ -22,15 +27,13 @@ func NewRouter() *gin.Engine {
 			authed.DELETE("user/:id", v1.UserDelete)
 			// 分类操作
 			authed.POST("category/add", v1.AddCate)
-			authed.GET("category/:id", v1.CateInfo)
-			authed.GET("categorys", v1.CateList)
 			authed.DELETE("category/:id", v1.DelCate)
 			// 文章操作
 			authed.POST("article/add", v1.AddArticle)
-			authed.GET("article/:id", v1.ArticleInfo)
 			authed.PUT("article/:id", v1.ArticleEdit)
-			authed.GET("articles/:id", v1.CateArticle)
 			authed.DELETE("article/:id", v1.ArticleDel)
+			// 个人信息
+			authed.PUT("profile/:id", v1.ProfilePut)
 		}
 	}
 	return r
