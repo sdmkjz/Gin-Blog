@@ -31,3 +31,27 @@ func ArticleEdit(c *gin.Context) {
 	res := art.ArticleEdit(id)
 	c.JSON(e.SUCCSE, res)
 }
+
+// 根据分类查询文章列表
+func CateArticle(c *gin.Context) {
+	var art service.ArticleService
+	pageSize, _ := strconv.Atoi(c.Query("pagesize"))
+	pageNum, _ := strconv.Atoi(c.Query("pagenum"))
+	id, _ := strconv.Atoi(c.Param("id"))
+	if pageSize == 0 {
+		pageSize = -1
+	}
+	if pageNum == 0 {
+		pageNum = -1
+	}
+	res := art.CateArticle(id, pageSize, pageNum)
+	c.JSON(e.SUCCSE, res)
+}
+
+// 删除文章
+func ArticleDel(c *gin.Context) {
+	var art service.ArticleService
+	id, _ := strconv.Atoi(c.Param("id"))
+	res := art.ArticleDel(id)
+	c.JSON(e.SUCCSE, res)
+}

@@ -29,6 +29,8 @@ func NewRouter() *gin.Engine {
 			authed.POST("article/add", v1.AddArticle)
 			authed.GET("article/:id", v1.ArticleInfo)
 			authed.PUT("article/:id", v1.ArticleEdit)
+			authed.GET("articles/:id", v1.CateArticle)
+			authed.DELETE("article/:id", v1.ArticleDel)
 		}
 	}
 	return r
